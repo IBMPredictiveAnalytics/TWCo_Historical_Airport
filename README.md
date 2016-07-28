@@ -4,6 +4,8 @@
 This extension provide capacity to fetch weather observation data through The Weather Company's Historical Observations API. Beside API, this extension can
 1. Pull in any historical weather date range (exceeds the API 30-31 day limit)
 2. Allow multiple lat / long locations input
+
+
 ![Screenshot](./Screenshot/stream.jpg)
 
 # Overview for Standard Site-Based Historical Observations
