@@ -1,4 +1,5 @@
 # Extension for The Weather Company Weather
+This implementation allows you to connect to APIs provided by The Weather Company from IBM SPSS Modeler. These APIs will require a key so that you can retrieve the actual weather data. Please contact your IBM sales representative so that we can assist you to obtain the key. 
 
 # Overview
 This extension provide capacity to fetch weather observation data through The Weather Company's Historical Observations API. Beside API, this extension can  
@@ -19,19 +20,17 @@ The Historical Observations API will return past weather observations, up to 1 m
 [The Weather Company](http://www.theweathercompany.com/)
 [Historical Weather](http://goo.gl/DplOKj)
 
----
 
-Requirements
-----
+#Requirements
+
 - IBM SPSS Modeler v18
 - R Essentials for SPSS Modeler plugin 
 
 More information here: [IBM Predictive Extensions][2]
 
----
 
-License
-----
+
+#License
 
 [Apache 2.0][1]
 
