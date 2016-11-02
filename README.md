@@ -20,7 +20,7 @@ The Historical Observations API will return past weather observations, up to 1 m
 3. All input column name shouldn't contain space.
 
 # Reference
-[The Weather Company](http://www.theweathercompany.com/)
+[The Weather Company](http://www.theweathercompany.com)
 [TWCo Historical Weather](http://goo.gl/DplOKj)
 
 
