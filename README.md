@@ -15,9 +15,8 @@ The Historical Observations API will return past weather observations, up to 1 m
 
 
 # Notes
-1. Because of Modeler issues, "lat" can't show in dailog.
-2. All input type(lat, long, startdate, enddate) should be string. 
-3. All input column name shouldn't contain space.
+1. All input types should meet the specifications. Latitude, Longitude should be in signed numbers, Start Date and End Date columns should be in a date field.
+3. Input columns can now include spaces.
 
 # Reference
 [The Weather Company](http://www.theweathercompany.com/)
@@ -42,6 +41,7 @@ More information here: [IBM Predictive Extensions][2]
 Contributors
 ----
 - Yu Wenpei [(mail)](yuwenp@cn.ibm.com)
+- Grant Case [(mail)](hangtime79@gmail.com)
 
 [1]: http://www.apache.org/licenses/LICENSE-2.0.html
 [2]: https://developer.ibm.com/predictiveanalytics/downloads/#tab2
