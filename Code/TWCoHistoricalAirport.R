@@ -1,14 +1,14 @@
 # **********************************Header*************************************
 # *********GENERAL*********
 # OBJECT NAME: TWCoHistoricalAirport 
-# VERSION: 2.05
+# VERSION: 2.11
 # OBJECT TYPE: R Custom Node
 # CATEGORY: Utility
 # SUBCATEGORY: Weather
 # CREATED BY:   YU WENPEI	
 # DATE:         11/15/2016
 # MODIFIED BY:  GRANT CASE
-# DATE:         01/29/2017
+# DATE:         03/19/2017
 # DESCRIPTION:
 # SPSS Modeler Predictive Extension to call the Historical-Site
 # based TWCo API and return results.
@@ -26,7 +26,7 @@
 # dplyr
 # jsonline
 # lubridate
-# 
+# mefa
 # 
 # 
 # *********MODIFICATION LOG*********
@@ -40,7 +40,9 @@
 # do postal codes need to be prefaced with the correct country code. This is
 # now handled in the extension. Also updated so columns with spaces will no
 # longer be an issue.
-# 
+# 03/19/2017 GSC
+# Added code so that users can pass more than 30 days of data
+#
 # *********TODO LOG*********
 # TODO(Grant Case): Add parallelism code
 #
@@ -85,6 +87,7 @@ library(dplyr)
 library(lubridate)
 library(urltools)
 library(jsonlite)
+library(mefa)
 
 
 # DEBUG print("End Install Package") # DB
@@ -332,10 +335,22 @@ is.TWCoDate  <- function(check.DF, check.start, check.end, check.historyonly = T
   # **********************************Header***********************************
   
   # -----------------------------------------------------------------------------
+  # -- TEST SECTION
+  # -----------------------------------------------------------------------------
+  # check.DF          <- URL.Data
+  # check.start       <- kmodDStartDateColNameConstant
+  # check.end         <- kmodDEndDateColNameConstant
+  # check.historyonly <- TRUE
+  
+  # -----------------------------------------------------------------------------
   # -- VARIABLE SET SECTION
   # -----------------------------------------------------------------------------
   # Earliest date of The Weather Companys observations - January 1931
   # Earliest date of The Weather Companys observations - January 1931
+  
+  
+  
+  
   earliest.date <- ymd(19310101)
   
   # If check.historyonly is true it will do the latest day + 1 otherwise + 7 days
@@ -371,20 +386,48 @@ is.TWCoDate  <- function(check.DF, check.start, check.end, check.historyonly = T
     print("Extension Error: Data Frame contained rows with a Future Date, No weather records yet")
   }
   
-  if (sum(check.DF[[check.end]] - check.DF[[check.start]] > 30, na.rm = TRUE) > 0) {
-    print("Extension Error: Data Frame contained rows where more than 31 days selected.")
-  }
-  
+  # Remove rows that have errors in the date, see exception handling above,
+  # where the start date or end date is NA, the start date, pre-dates end
+  # date and where earliest date is before recording or after the latest 
+  # date in the system.
   check.DF <-    check.DF[!(is.na(check.DF[[check.start]]) 
                        | is.na(check.DF[[check.end]])
                        | check.DF[[check.start]] > check.DF[[check.end]]
                        | check.DF[[check.start]] < earliest.date
                        | check.DF[[check.end]] < earliest.date
                        | check.DF[[check.start]] > latest.date
-                       | check.DF[[check.end]] > latest.date
-                       | check.DF[[check.end]] - check.DF[[check.start]]  > 30)
+                       | check.DF[[check.end]] > latest.date)
                        , ]
                        
+  
+  # Split the data frame in two so that spans of greater than 30 days, TWC
+  # counts the dates as such Jan 31st - Jan 1st would be 31 days as the 31st
+  # returns information, are in the Above30Day, which those that are below
+  # go directly to landing.
+  Above30Day <- check.DF[check.DF[[check.end]] - check.DF[[check.start]]  > 29, ]
+  check.DF   <- check.DF[check.DF[[check.end]] - check.DF[[check.start]]  <= 29, ]
+  
+  if (NROW(Above30Day) > 0) {
+  
+    for(i in 1:NROW(Above30Day)) {
+      # Pull a row out that is above 30 days and create a sequence
+      # so that we have a set of start and end dates that span
+      # 30 days. You now replicate the rows to match the new sequence
+      # and combine back the new start and end dates.
+      To_Test <- Above30Day[i, ]
+      new.start.date <- seq.Date(To_Test[[check.start]],To_Test[[check.end]],by = "30 day")
+      new.end.date <- (new.start.date + 29)
+      Clean30Day <- rep(To_Test, NROW(new.start.date))
+      Clean30Day$start.date <- new.start.date
+      Clean30Day$end.date <- if_else(Clean30Day$end.date < new.end.date, Clean30Day$end.date, new.end.date)
+      check.DF <- rbind(check.DF, Clean30Day)
+    }
+  }  
+  
+  
+
+  
+  
   return(check.DF)
 } ### END is.TWCoDate
 
@@ -968,7 +1011,7 @@ BuildmodelerDataModel <- function(source.DF, API, API.Location) {
 
 
 # DEBUG save.image(file=kDebugImageLocation, safe=FALSE) # DB
-# print("End Node-Specific Functions") # DB
+# DEBUG print("End Node-Specific Functions") # DB
 
 
 
@@ -1123,6 +1166,9 @@ URL.Data <- UpdateTWCoURLParameters  (URL.Data,
                                       kmodDPostalCodeColNameConstant,
                                       kmodDStationIDColNameConstant,
                                       dialog.column.countrycode)
+
+# Check Uniqueness One Last Time
+URL.Data <- unique(URL.Data)
 
 # Retrieve and create the modelerData that will be returned to Modeler
 modelerData <- RetrieveTWCoJSON (URL.Data,
