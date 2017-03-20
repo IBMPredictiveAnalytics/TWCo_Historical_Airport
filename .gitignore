@@ -1,3 +1,4 @@
-Code/Debug/TWCOHistoricalAirport.RData
 *.str-
-Code/UnitTest-TWCoHistoricalAirport.str-
+Code/Debug/
+Code/Functions/
+Code/UnitTest-TWCoHistoricalAirport.str
