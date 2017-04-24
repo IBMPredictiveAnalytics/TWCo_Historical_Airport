@@ -25,7 +25,7 @@ The Historical Observations API will return past weather observations, up to 1 m
 [TWCo Historical Airport](http://goo.gl/DplOKj)
 
 
-#Requirements
+# Requirements
 
 - IBM SPSS Modeler v18
 - R Essentials for SPSS Modeler plugin 
@@ -33,8 +33,11 @@ The Historical Observations API will return past weather observations, up to 1 m
 More information here: [IBM Predictive Extensions][2]
 
 
+# Troube Shoot
+[TWC Extension Trouble Shoot](https://github.com/IBMPredictiveAnalytics/TWCo_Document/blob/master/twc%20extension%20trouble%20shoot.md)
 
-#License
+
+# License
 
 [Apache 2.0][1]
 
